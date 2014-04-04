@@ -12,6 +12,8 @@ will work with glimpse.
 import urllib
 import os
 import os.path
+import Image
+import gimage
 
 class ImageNet():
     def __init__(self):
@@ -29,5 +31,33 @@ class ImageNet():
                 #we must check that the url actually returns us a 200 status code before we can try to download.
                 if urlReq.getcode() == 200 and urlReq.info().maintype == "image":
                     urllib.urlretrieve(line, os.path.join(saveDir,filename))
-                
+                    
+    '''
+    crop each image from imagenet to be 256x256 based on the images shortest side.
+    '''            
+    def normalizeData(self,dir):
         
+        for img in os.listdir(dir):
+            print img
+            # find the shortest side of the image then scale by that side
+            tmp = Image.open(os.path.join(dir,img))
+            width,height = tmp.size
+            normalized = gimage.ScaleAndCropImage(tmp, (256,256))
+            normalized.save(os.path.join(dir,img),"JPEG")
+            #scale the shortest side to 256 pixels then crop out an even 256 x 256 image
+            '''
+            if width <= height:
+                # figure out the height percent that we need to scale by to get 256 scaling ratio
+                hScale = 256/float(height)
+                newHeight = int(float(height)*float(hScale))
+                tmp = tmp.resize((256,newHeight),Image.ANTIALIAS)
+            
+            elif height <= width:
+                
+                wScale = float(256)/float(width)
+                newWidth = int(float(width)*float(wScale))
+                tmp = tmp.resize((newWidth,256),Image.ANTIALIAS)
+            '''
+            #first check if shortest size is greater than 256 pixels
+            
+            
